@@ -1,8 +1,10 @@
 # Anchored-branched Universal Physics Transformers
 
+Run the tutorial direclty in [colab](https://colab.research.google.com/github/Emmi-AI/anchored-branched-universal-physics-transformers/blob/main/tutorial.ipynb).
+
 Implementation of [AB-UPT](https://arxiv.org/abs/2502.09692) containing:
 - Model implementation [src/model.py](https://github.com/Emmi-AI/anchored-branched-universal-physics-transformers/blob/main/src/model.py)
-- DrivAerML dataset implementation [src/drivaerml.py](https://github.com/Emmi-AI/anchored-branched-universal-physics-transformers/blob/main/src/drivaerml_dataset.py)
+- DrivAerML dataset implementation [src/drivaerml_dataset.py](https://github.com/Emmi-AI/anchored-branched-universal-physics-transformers/blob/main/src/drivaerml_dataset.py)
 - Preprocessing pipeline [src/abupt_collator.py](https://github.com/Emmi-AI/anchored-branched-universal-physics-transformers/blob/main/src/abupt_collator.py)
 
 The [tutorial.ipynb](https://github.com/Emmi-AI/anchored-branched-universal-physics-transformers/blob/main/tutorial.ipynb) notebook showcases various aspects of our work:
@@ -10,7 +12,7 @@ The [tutorial.ipynb](https://github.com/Emmi-AI/anchored-branched-universal-phys
 - Preprocessing data for AB-UPT
 - Running inference with AB-UPT to calculate MSE, L2 error, drag/lift coefficients and streamline velocity visualizations
 
-We recommend to check it out yourself in an interactive [google colab](https://colab.research.google.com/) runtime.
+We recommend to check it out yourself in an interactive [google colab](https://colab.research.google.com/github/Emmi-AI/anchored-branched-universal-physics-transformers/blob/main/tutorial.ipynb) runtime.
 
 # Further resources
 
