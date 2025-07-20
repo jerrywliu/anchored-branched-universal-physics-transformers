@@ -1,5 +1,9 @@
 # Anchored-branched Universal Physics Transformers
 
+## Downloading the data
+Download with
+`sbatch src/download/download.sh [HF_TOKEN]`
+
 Run the tutorial direclty in [colab](https://colab.research.google.com/github/Emmi-AI/anchored-branched-universal-physics-transformers/blob/main/tutorial.ipynb).
 
 Implementation of [AB-UPT](https://arxiv.org/abs/2502.09692) containing:
