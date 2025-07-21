@@ -10,29 +10,30 @@
 #SBATCH --output=download_%j.log
 #SBATCH --error=download_%j.err
 
-# ----------------------------
+# --------------------------------------
 # CONFIGURATION
-# ----------------------------
+# --------------------------------------
 
 HF_OWNER="neashton"
 HF_PREFIX="drivaerml"
 LOCAL_DIR="/pscratch/sd/j/jwl50/drivaerml/.cache"
+NUM_THREADS=${SLURM_CPUS_PER_TASK:-64}  # fallback if run outside Slurm
 
-# Token from argument or environment
+# Get token from env or argument
 if [[ -n "$1" ]]; then
     HF_TOKEN="$1"
 elif [[ -n "$HF_TOKEN" ]]; then
     HF_TOKEN="$HF_TOKEN"
 else
-    echo "Error: Hugging Face token not provided. Pass it as a command line arg or set HF_TOKEN env variable."
+    echo "Error: Hugging Face token not provided."
     exit 1
 fi
 
 mkdir -p "$LOCAL_DIR"
 
-# ----------------------------
-# DOWNLOAD FUNCTION
-# ----------------------------
+# --------------------------------------
+# THREADED DOWNLOAD FUNCTION
+# --------------------------------------
 
 download_single_run() {
     i="$1"
@@ -43,26 +44,34 @@ download_single_run() {
     echo "Downloading run_$i..."
 
     wget --header="Authorization: Bearer $HF_TOKEN" \
-        "https://huggingface.co/datasets/${HF_OWNER}/${HF_PREFIX}/resolve/main/$RUN_DIR/drivaer_${i}.stl" \
-        -O "$RUN_LOCAL_DIR/drivaer_${i}.stl"
+         "https://huggingface.co/datasets/${HF_OWNER}/${HF_PREFIX}/resolve/main/$RUN_DIR/drivaer_${i}.stl" \
+         -O "$RUN_LOCAL_DIR/drivaer_${i}.stl"
 
     wget --header="Authorization: Bearer $HF_TOKEN" \
-        "https://huggingface.co/datasets/${HF_OWNER}/${HF_PREFIX}/resolve/main/$RUN_DIR/boundary_${i}.vtp" \
-        -O "$RUN_LOCAL_DIR/boundary_${i}.vtp"
+         "https://huggingface.co/datasets/${HF_OWNER}/${HF_PREFIX}/resolve/main/$RUN_DIR/boundary_${i}.vtp" \
+         -O "$RUN_LOCAL_DIR/boundary_${i}.vtp"
 
     wget --header="Authorization: Bearer $HF_TOKEN" \
-        "https://huggingface.co/datasets/${HF_OWNER}/${HF_PREFIX}/resolve/main/$RUN_DIR/geo_ref_${i}.csv" \
-        -O "$RUN_LOCAL_DIR/geo_ref_${i}.csv"
+         "https://huggingface.co/datasets/${HF_OWNER}/${HF_PREFIX}/resolve/main/$RUN_DIR/geo_ref_${i}.csv" \
+         -O "$RUN_LOCAL_DIR/geo_ref_${i}.csv"
 }
 
-export -f download_single_run
+# --------------------------------------
+# JOB SCHEDULER-STYLE LOOP
+# --------------------------------------
 
-# ----------------------------
-# MAIN: PARALLEL EXECUTION
-# ----------------------------
+i=1
+while [[ $i -le 500 ]]; do
+    # Launch in background
+    download_single_run "$i" &
 
-# Load parallel if needed
-module load parallel
+    # Count number of active jobs
+    while [[ $(jobs -r -p | wc -l) -ge $NUM_THREADS ]]; do
+        sleep 1
+    done
 
-# Use GNU parallel to run multiple downloads in parallel
-seq 1 500 | parallel -j $SLURM_CPUS_PER_TASK download_single_run
+    ((i++))
+done
+
+# Wait for all background jobs to complete
+wait
